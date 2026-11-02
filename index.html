@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f6f1">
+    <title>Conformance Calculator</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+            --page: #f4f6f1;
+            --surface: #fffefa;
+            --surface-muted: #edf2e8;
+            --text: #202b25;
+            --muted: #59665d;
+            --line: #d7ded4;
+            --accent: #176b54;
+            --accent-hover: #10513f;
+            --accent-soft: #dcebe3;
+            --focus: #bf6d30;
+            --shadow: 0 18px 48px rgb(34 53 42 / 9%);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --page: #171d19;
+                --surface: #222b25;
+                --surface-muted: #2b382f;
+                --text: #eef4ed;
+                --muted: #b6c4b8;
+                --line: #3c4a40;
+                --accent: #83c6a9;
+                --accent-hover: #a2d8be;
+                --accent-soft: #294438;
+                --focus: #f2ad71;
+                --shadow: 0 18px 48px rgb(0 0 0 / 20%);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-width: 320px;
+            min-height: 100vh;
+            margin: 0;
+            padding: 48px 20px;
+            background-color: var(--page);
+            background-image: radial-gradient(ellipse at 12% 0%, var(--accent-soft), transparent 34rem);
+            color: var(--text);
+            font-family: "Aptos", "Segoe UI", sans-serif;
+            line-height: 1.55;
+        }
+
+        .container {
+            width: min(100%, 760px);
+            margin: 0 auto;
+        }
+
+        .page-heading {
+            margin: 0 0 22px;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 500;
+            line-height: 1.1;
+            text-align: center;
+        }
+
+        .page-heading span {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--accent);
+            font-family: "Aptos", "Segoe UI", sans-serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .calculator {
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+        }
+
+        .intro {
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--line);
+            background: var(--surface-muted);
+        }
+
+        .intro h2 {
+            margin: 0 0 8px;
+            color: var(--accent);
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 1.35rem;
+            font-weight: 500;
+        }
+
+        .intro p {
+            margin: 0 0 10px;
+        }
+
+        .intro p:last-of-type {
+            margin-bottom: 8px;
+        }
+
+        .intro ul {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 5px 20px;
+            margin: 0;
+            padding-left: 20px;
+            color: var(--muted);
+        }
+
+        .form-area {
+            padding: 26px 28px 28px;
+        }
+
+        .fields {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 0.9rem;
+            font-weight: 650;
+        }
+
+        input,
+        select {
+            width: 100%;
+            min-height: 46px;
+            padding: 10px 12px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: var(--surface);
+            color: var(--text);
+            font: inherit;
+        }
+
+        input:focus-visible,
+        select:focus-visible,
+        button:focus-visible {
+            outline: 3px solid var(--focus);
+            outline-offset: 2px;
+        }
+
+        .results {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        .result-box {
+            min-width: 0;
+            padding: 17px 10px;
+            border: 1px solid var(--line);
+            border-radius: 7px;
+            text-align: center;
+        }
+
+        .result-box h3 {
+            margin: 0 0 8px;
+            color: var(--muted);
+            font-size: 0.82rem;
+            font-weight: 650;
+        }
+
+        .result-value {
+            color: var(--accent);
+            font-size: clamp(1.25rem, 4vw, 1.7rem);
+            font-variant-numeric: tabular-nums;
+            font-weight: 750;
+            line-height: 1.2;
+        }
+
+        .copy-button {
+            width: 100%;
+            min-height: 48px;
+            margin-top: 20px;
+            padding: 11px 16px;
+            border: 0;
+            border-radius: 6px;
+            background: var(--accent);
+            color: #fff;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .copy-button:hover {
+            background: var(--accent-hover);
+        }
+
+        .copy-status {
+            min-height: 1.5em;
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        .footer {
+            margin: 18px 0 0;
+            color: var(--muted);
+            font-size: 0.82rem;
+            text-align: center;
+        }
+
+        @media (max-width: 560px) {
+            body {
+                padding: 28px 14px;
+            }
+
+            .intro,
+            .form-area {
+                padding: 20px;
+            }
+
+            .intro ul {
+                grid-template-columns: 1fr;
+                gap: 3px;
+            }
+
+            .fields {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+
+            .results {
+                gap: 8px;
+            }
+
+            .result-box {
+                padding: 14px 5px;
+            }
+
+            .result-box h3 {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <h1 class="page-heading"><span>Workforce management</span>Conformance Calculator</h1>
+
+        <section class="calculator" aria-label="Conformance allowance calculator">
+            <div class="intro">
+                <h2>What is conformance?</h2>
+                <p><strong>Conformance</strong> means being where you are supposed to be, doing what you are scheduled to do, when you are scheduled to do it.</p>
+                <p>In a contact center or workforce management context:</p>
+                <ul>
+                    <li>Taking calls when scheduled</li>
+                    <li>Taking breaks when scheduled</li>
+                    <li>Attending scheduled meetings</li>
+                    <li>Taking lunch at the scheduled time</li>
+                </ul>
+            </div>
+
+            <div class="form-area">
+                <div class="fields">
+                    <div class="form-group">
+                        <label for="preset">Schedule preset</label>
+                        <select id="preset">
+                            <option value="">Custom</option>
+                            <option value="8,5,21.7">5 days x 8 hours</option>
+                            <option value="10,4,17.3">4 days x 10 hours</option>
+                            <option value="9.5,3.5,15.2">3 on / 3 off</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="hours">Hours per work day</label>
+                        <input type="number" id="hours" value="9.5" min="0" step="0.25" inputmode="decimal">
+                    </div>
+                    <div class="form-group">
+                        <label for="goal">Conformance goal (%)</label>
+                        <input type="number" id="goal" value="90" min="0" max="100" step="1" inputmode="decimal">
+                    </div>
+                    <div class="form-group">
+                        <label for="weekDays">Work days per week</label>
+                        <input type="number" id="weekDays" value="3.5" min="0" step="0.1" inputmode="decimal">
+                    </div>
+                    <div class="form-group">
+                        <label for="monthDays">Work days per month</label>
+                        <input type="number" id="monthDays" value="15.2" min="0" step="0.1" inputmode="decimal">
+                    </div>
+                </div>
+
+                <div class="results" aria-live="polite" aria-label="Out-of-conformance time allowance">
+                    <div class="result-box">
+                        <h3>Daily allowance</h3>
+                        <div class="result-value" id="daily">57m</div>
+                    </div>
+                    <div class="result-box">
+                        <h3>Weekly allowance</h3>
+                        <div class="result-value" id="weekly">3h 20m</div>
+                    </div>
+                    <div class="result-box">
+                        <h3>Monthly allowance</h3>
+                        <div class="result-value" id="monthly">14h 26m</div>
+                    </div>
+                </div>
+
+                <button class="copy-button" id="copyResults" type="button">Copy results</button>
+                <p class="copy-status" id="copyStatus" role="status" aria-live="polite"></p>
+                <p class="footer">Out-of-conformance time allowed while maintaining target conformance</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function formatHours(hours) {
+            const rawMinutes = hours * 60;
+            const totalMinutes = Math.round(rawMinutes + Number.EPSILON * Math.abs(rawMinutes));
+            const wholeHours = Math.floor(totalMinutes / 60);
+            const minutes = totalMinutes % 60;
+
+            if (wholeHours === 0) {
+                return `${minutes}m`;
+            }
+
+            return `${wholeHours}h ${minutes}m`;
+        }
+
+        function readNumber(id, minimum, maximum = Infinity) {
+            const value = Number.parseFloat(document.getElementById(id).value);
+            return Number.isFinite(value) ? Math.min(maximum, Math.max(minimum, value)) : 0;
+        }
+
+        function calculate() {
+            const shiftHours = readNumber("hours", 0);
+            const goal = readNumber("goal", 0, 100);
+            const weekDays = readNumber("weekDays", 0);
+            const monthDays = readNumber("monthDays", 0);
+            const dailyAllowance = shiftHours * (1 - goal / 100);
+
+            document.getElementById("daily").textContent = formatHours(dailyAllowance);
+            document.getElementById("weekly").textContent = formatHours(dailyAllowance * weekDays);
+            document.getElementById("monthly").textContent = formatHours(dailyAllowance * monthDays);
+        }
+
+        async function copyResults() {
+            const text = [
+                "Conformance Calculator Results",
+                "",
+                `Daily Allowance: ${document.getElementById("daily").textContent}`,
+                `Weekly Allowance: ${document.getElementById("weekly").textContent}`,
+                `Monthly Allowance: ${document.getElementById("monthly").textContent}`
+            ].join("\n");
+            const status = document.getElementById("copyStatus");
+
+            try {
+                await navigator.clipboard.writeText(text);
+                status.textContent = "Results copied to clipboard.";
+            } catch {
+                status.textContent = "Clipboard access is unavailable in this browser context.";
+            }
+        }
+
+        document.querySelectorAll("input").forEach(input => {
+            input.addEventListener("input", calculate);
+        });
+
+        document.getElementById("preset").addEventListener("change", event => {
+            if (!event.target.value) {
+                return;
+            }
+
+            const [hours, weekDays, monthDays] = event.target.value.split(",");
+            document.getElementById("hours").value = hours;
+            document.getElementById("weekDays").value = weekDays;
+            document.getElementById("monthDays").value = monthDays;
+            calculate();
+        });
+
+        document.getElementById("copyResults").addEventListener("click", copyResults);
+        calculate();
+    </script>
+</body>
+</html>
