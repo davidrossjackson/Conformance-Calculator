@@ -15,7 +15,6 @@
             --muted: #59665d;
             --line: #d7ded4;
             --accent: #176b54;
-            --accent-hover: #10513f;
             --accent-soft: #dcebe3;
             --focus: #bf6d30;
             --shadow: 0 18px 48px rgb(34 53 42 / 9%);
@@ -30,7 +29,6 @@
                 --muted: #b6c4b8;
                 --line: #3c4a40;
                 --accent: #83c6a9;
-                --accent-hover: #a2d8be;
                 --accent-soft: #294438;
                 --focus: #f2ad71;
                 --shadow: 0 18px 48px rgb(0 0 0 / 20%);
@@ -183,32 +181,6 @@
             line-height: 1.2;
         }
 
-        .copy-button {
-            width: 100%;
-            min-height: 48px;
-            margin-top: 20px;
-            padding: 11px 16px;
-            border: 0;
-            border-radius: 6px;
-            background: var(--accent);
-            color: #fff;
-            font: inherit;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .copy-button:hover {
-            background: var(--accent-hover);
-        }
-
-        .copy-status {
-            min-height: 1.5em;
-            margin: 8px 0 0;
-            color: var(--muted);
-            font-size: 0.85rem;
-            text-align: center;
-        }
-
         .footer {
             margin: 18px 0 0;
             color: var(--muted);
@@ -311,8 +283,6 @@
                     </div>
                 </div>
 
-                <button class="copy-button" id="copyResults" type="button">Copy results</button>
-                <p class="copy-status" id="copyStatus" role="status" aria-live="polite"></p>
                 <p class="footer">Out-of-conformance time allowed while maintaining target conformance</p>
             </div>
         </section>
@@ -349,24 +319,6 @@
             document.getElementById("monthly").textContent = formatHours(dailyAllowance * monthDays);
         }
 
-        async function copyResults() {
-            const text = [
-                "Conformance Calculator Results",
-                "",
-                `Daily Allowance: ${document.getElementById("daily").textContent}`,
-                `Weekly Allowance: ${document.getElementById("weekly").textContent}`,
-                `Monthly Allowance: ${document.getElementById("monthly").textContent}`
-            ].join("\n");
-            const status = document.getElementById("copyStatus");
-
-            try {
-                await navigator.clipboard.writeText(text);
-                status.textContent = "Results copied to clipboard.";
-            } catch {
-                status.textContent = "Clipboard access is unavailable in this browser context.";
-            }
-        }
-
         document.querySelectorAll("input").forEach(input => {
             input.addEventListener("input", calculate);
         });
@@ -383,7 +335,6 @@
             calculate();
         });
 
-        document.getElementById("copyResults").addEventListener("click", copyResults);
         calculate();
     </script>
 </body>
